@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -89,6 +90,8 @@ func deleteBook(w http.ResponseWriter, r *http.Request) {
 
 // Main function
 func main() {
+
+	fmt.Println("Golang server started successful at port 8000!")
 	// Init router
 	r := mux.NewRouter()
 
@@ -104,7 +107,7 @@ func main() {
 	r.HandleFunc("/books/{id}", deleteBook).Methods("DELETE")
 
 	// Start server
-	log.Fatal(http.ListenAndServe(":8001", r))
+	log.Fatal(http.ListenAndServe(":8000", r))
 }
 
 // Request sample
