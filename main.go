@@ -8,9 +8,6 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	// "go.mongodb.org/mongo-driver/bson"
-	// "go.mongodb.org/mongo-driver/mongo"
-	// "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Post struct {
@@ -25,8 +22,16 @@ func getPosts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(posts)
 }
-
 func createPost(w http.ResponseWriter, r *http.Request) {
+	// 	err := r.ParseForm()
+	// if err != nil {
+	//     // in case of any error
+	//     return
+	// }
+
+	// // Use the r.Form.Get() method to retrieve the relevant data fields
+	// // from the r.Form map.
+	// value := r.Form.Get("parameter_name") // attention! r.Form, not r.PostForm
 	w.Header().Set("Content-Type", "application/json")
 	var post Post
 	_ = json.NewDecoder(r.Body).Decode(&post)
@@ -34,7 +39,6 @@ func createPost(w http.ResponseWriter, r *http.Request) {
 	posts = append(posts, post)
 	json.NewEncoder(w).Encode(&post)
 }
-
 func getPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
@@ -46,7 +50,6 @@ func getPost(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(&Post{})
 }
-
 func updatePost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
@@ -63,7 +66,6 @@ func updatePost(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(posts)
 }
-
 func deletePost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
@@ -77,16 +79,16 @@ func deletePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-
-	fmt.Println("Golang server started successful at port 8000!")
-
 	router := mux.NewRouter()
-	posts = append(posts, Post{ID: "1", Title: "My first post", Body: "This is the content of my first post"})
-	router.HandleFunc("/posts", getPosts).Methods("GET")
-	router.HandleFunc("/posts", createPost).Methods("POST")
-	router.HandleFunc("/posts/{id}", getPost).Methods("GET")
-	router.HandleFunc("/posts/{id}", updatePost).Methods("PUT")
-	router.HandleFunc("/posts/{id}", deletePost).Methods("DELETE")
-	http.ListenAndServe(":8000", router)
+	// posts = append(posts, Post{ID: "1", Title: "My first post", Body: "This is the content of my first post"})
+	// router.HandleFunc("/posts", getPosts).Methods("GET")
+	// router.HandleFunc("/posts", createPost).Methods("POST")
+	// router.HandleFunc("/posts/{id}", getPost).Methods("GET")
+	// router.HandleFunc("/posts/{id}", updatePost).Methods("PUT")
+	// router.HandleFunc("/posts/{id}", deletePost).Methods("DELETE")
+	router.HandleFunc("/insert_register_user", insert_register_user).Methods("POST")
+
+	fmt.Println("Server has successfully run on port 80")
+	http.ListenAndServe(":80", router)
 
 }

@@ -2,8 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 	"log"
+	"net/http"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -11,6 +12,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/crypto/bcrypt"
 )
+
+type User struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
 
 func user_service() string {
 	// fmt.Println("db service")
@@ -50,7 +56,7 @@ func password_validation(hashPassword1 []byte, hashPassword2 []byte) string {
 
 }
 
-func insert_user(username string, password string) {
+func insert_mongo_user(username string, password string) {
 
 	//mongodb client
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://leviooi:1123956321@206.189.152.72:27017/?authSource=admin"))
@@ -75,5 +81,24 @@ func insert_user(username string, password string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Inserted %v documents into episode collection!\n", usersResult)
+
+}
+
+func insert_register_user(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	err := r.ParseForm()
+	if err != nil {
+		// in case of any error
+		return
+	}
+	//var user User
+
+	// Use the r.Form.Get() method to retrieve the relevant data fields
+	// from the r.Form map.
+	username := r.Form.Get("username")
+	//password := r.Form.Get("password")
+
+	//result := insert_mongo_user(username, password)
+
+	json.NewEncoder(w).Encode(username)
 }
