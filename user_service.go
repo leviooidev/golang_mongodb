@@ -2,9 +2,8 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	"fmt"
 	"log"
-	"net/http"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,11 +15,6 @@ import (
 type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-}
-
-func user_service() string {
-	// fmt.Println("db service")
-	return "Here"
 }
 
 func hashing_password(password string) []byte {
@@ -56,10 +50,11 @@ func password_validation(hashPassword1 []byte, hashPassword2 []byte) string {
 
 }
 
-func insert_mongo_user(username string, password string) {
-
+// Check is it the user is already registered
+func checkRegisterUser(username string) int {
+	//connectionPath := mongodbConnectionPath()
 	//mongodb client
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://leviooi:1123956321@206.189.152.72:27017/?authSource=admin"))
+	client, err := mongo.NewClient(options.Client().ApplyURI(mongodbConnectionPath()))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -73,32 +68,53 @@ func insert_mongo_user(username string, password string) {
 	quickstartDatabase := client.Database("lfu_db")
 	usersCollection := quickstartDatabase.Collection("users")
 
-	usersResult, err := usersCollection.InsertOne(ctx, bson.D{
-		{Key: "user", Value: username},
-		{Key: "password", Value: string(password)},
-	})
-
+	filterCursor, err := usersCollection.Find(ctx, bson.M{"user": username})
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	var episodesFiltered []bson.M
+	if err = filterCursor.All(ctx, &episodesFiltered); err != nil {
+		log.Fatal(err)
+	}
+	//fmt.Println(len(episodesFiltered))
+	return len(episodesFiltered)
 }
 
-func insert_register_user(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	err := r.ParseForm()
-	if err != nil {
-		// in case of any error
-		return
+//Insert user info into db
+func insert_mongo_user(username string, password string) string {
+
+	result := ""
+
+	if checkRegisterUser(username) == 0 {
+
+		//mongodb client
+		client, err := mongo.NewClient(options.Client().ApplyURI(mongodbConnectionPath()))
+		if err != nil {
+			log.Fatal(err)
+		}
+		ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+		err = client.Connect(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer client.Disconnect(ctx)
+
+		quickstartDatabase := client.Database("lfu_db")
+		usersCollection := quickstartDatabase.Collection("users")
+
+		usersResult, err := usersCollection.InsertOne(ctx, bson.D{
+			{Key: "user", Value: username},
+			{Key: "password", Value: hashing_password(password)},
+		})
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		result = fmt.Sprintf("Successful: Inserted a single document: %d.", usersResult.InsertedID)
+
+	} else {
+		result = "Failed: username already registered."
 	}
-	//var user User
-
-	// Use the r.Form.Get() method to retrieve the relevant data fields
-	// from the r.Form map.
-	username := r.Form.Get("username")
-	//password := r.Form.Get("password")
-
-	//result := insert_mongo_user(username, password)
-
-	json.NewEncoder(w).Encode(username)
+	return result
 }

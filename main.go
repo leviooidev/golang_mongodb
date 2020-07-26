@@ -80,15 +80,12 @@ func deletePost(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	router := mux.NewRouter()
-	// posts = append(posts, Post{ID: "1", Title: "My first post", Body: "This is the content of my first post"})
-	// router.HandleFunc("/posts", getPosts).Methods("GET")
-	// router.HandleFunc("/posts", createPost).Methods("POST")
-	// router.HandleFunc("/posts/{id}", getPost).Methods("GET")
-	// router.HandleFunc("/posts/{id}", updatePost).Methods("PUT")
-	// router.HandleFunc("/posts/{id}", deletePost).Methods("DELETE")
+
 	router.HandleFunc("/insert_register_user", insert_register_user).Methods("POST")
 
 	fmt.Println("Server has successfully run on port 80")
 	http.ListenAndServe(":80", router)
+
+	//checkRegisterUser()
 
 }
