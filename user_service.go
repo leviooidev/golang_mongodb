@@ -9,45 +9,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-}
-
-func hashing_password(password string) []byte {
-	//Declare username variable
-	//username := "Yhishuang"
-	//userPassword1 := "some user-provided password"
-
-	// Generate "hash" to store from user password
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		// TODO: Properly handle error
-		log.Fatal(err)
-	}
-	//fmt.Println("Hash to store:", string(hash))
-	// Store this "hash" somewhere, e.g. in your database
-	return hash
-
-}
-
-func password_validation(hashPassword1 []byte, hashPassword2 []byte) string {
-	// After a while, the user wants to log in and you need to check the password he entered
-	// userPassword2 := "some user-provided password"
-	// hashFromDatabase := []byte("$2a$10$7Yu83J03Lt8RGBFdnT5rKu3T1K8UD3c/Pzp/Ijt1haPOsJYNNN.AS")
-
-	// Comparing the password with the hash
-	if err := bcrypt.CompareHashAndPassword(hashPassword1, hashPassword2); err != nil {
-		// TODO: Properly handle error
-		log.Fatal(err)
-	}
-
-	//fmt.Println("Password was correct!")
-	return "Password was correct!"
-
 }
 
 // Check is it the user is already registered
@@ -81,7 +47,7 @@ func checkRegisterUser(username string) int {
 }
 
 //Insert user info into db
-func insert_mongo_user(username string, password string) string {
+func insertMongoUser(username string, password string) string {
 
 	result := ""
 
@@ -104,7 +70,7 @@ func insert_mongo_user(username string, password string) string {
 
 		usersResult, err := usersCollection.InsertOne(ctx, bson.D{
 			{Key: "user", Value: username},
-			{Key: "password", Value: hashing_password(password)},
+			{Key: "password", Value: hashingPassword(password)},
 		})
 
 		if err != nil {
@@ -146,7 +112,7 @@ func checkLoginUser(username string, password string) {
 		log.Fatal(err)
 	}
 
-	vPassword := episodesFiltered[0]
+	vPassword := episodesFiltered
 	fmt.Println(vPassword)
 
 }

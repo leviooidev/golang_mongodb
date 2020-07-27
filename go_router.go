@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func insert_register_user(w http.ResponseWriter, r *http.Request) {
+func insertRegisterUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	err := r.ParseForm()
 	if err != nil {
@@ -18,7 +18,7 @@ func insert_register_user(w http.ResponseWriter, r *http.Request) {
 	vusername := r.Form.Get("username")
 	vpassword := r.Form.Get("password")
 
-	result := insert_mongo_user(vusername, vpassword)
+	result := insertMongoUser(vusername, vpassword)
 
 	json.NewEncoder(w).Encode(result)
 }
