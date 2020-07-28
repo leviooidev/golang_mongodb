@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -80,12 +81,14 @@ func deletePost(w http.ResponseWriter, r *http.Request) {
 func main() {
 	// router := mux.NewRouter()
 
-	// router.HandleFunc("/insert_register_user", insert_register_user).Methods("POST")
+	// router.HandleFunc("/insert_register_user", insertRegisterUser).Methods("POST")
 
 	// fmt.Println("Server has successfully run on port 80")
 	// http.ListenAndServe(":80", router)
 
 	//checkRegisterUser()
-	checkLoginUser("yhishuang", "1123956321")
+	//checkLoginUser("yhishuang", "1123956321")
+
+	fmt.Println(string(hashingPassword("1123956321")))
 
 }

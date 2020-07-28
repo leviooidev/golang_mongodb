@@ -12,8 +12,8 @@ import (
 )
 
 type User struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	user     string
+	password string
 }
 
 // Check is it the user is already registered
@@ -70,7 +70,7 @@ func insertMongoUser(username string, password string) string {
 
 		usersResult, err := usersCollection.InsertOne(ctx, bson.D{
 			{Key: "user", Value: username},
-			{Key: "password", Value: hashingPassword(password)},
+			{Key: "password", Value: string(hashingPassword(password))},
 		})
 
 		if err != nil {
@@ -85,7 +85,7 @@ func insertMongoUser(username string, password string) string {
 	return result
 }
 
-func checkLoginUser(username string, password string) {
+func checkLoginUser(vUsername string, vPassword string) {
 
 	//connectionPath := mongodbConnectionPath()
 	//mongodb client
@@ -103,7 +103,7 @@ func checkLoginUser(username string, password string) {
 	quickstartDatabase := client.Database("lfu_db")
 	usersCollection := quickstartDatabase.Collection("users")
 
-	filterCursor, err := usersCollection.Find(ctx, bson.M{"user": username})
+	filterCursor, err := usersCollection.Find(ctx, bson.M{"user": vUsername})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -112,8 +112,11 @@ func checkLoginUser(username string, password string) {
 		log.Fatal(err)
 	}
 
-	vPassword := episodesFiltered
-	fmt.Println(vPassword)
+	// test := bson.M{"a": 1, "b": true}
+	// fmt.Println(test["a"])
+
+	password := episodesFiltered[0]["password"]
+	fmt.Println(password)
 
 }
 
