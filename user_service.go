@@ -11,11 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type User struct {
-	user     string
-	password string
-}
-
 // Check is it the user is already registered
 func checkRegisterUser(username string) int {
 	//connectionPath := mongodbConnectionPath()
@@ -51,6 +46,8 @@ func insertMongoUser(username string, password string) string {
 
 	result := ""
 
+	hash, _ := HashPassword(password)
+
 	if checkRegisterUser(username) == 0 {
 
 		//mongodb client
@@ -70,7 +67,7 @@ func insertMongoUser(username string, password string) string {
 
 		usersResult, err := usersCollection.InsertOne(ctx, bson.D{
 			{Key: "user", Value: username},
-			{Key: "password", Value: string(hashingPassword(password))},
+			{Key: "password", Value: hash},
 		})
 
 		if err != nil {
@@ -85,8 +82,9 @@ func insertMongoUser(username string, password string) string {
 	return result
 }
 
-func checkLoginUser(vUsername string, vPassword string) {
+func checkLoginUser(vUsername string, vPassword string) (string, string) {
 
+	result := ""
 	//connectionPath := mongodbConnectionPath()
 	//mongodb client
 	client, err := mongo.NewClient(options.Client().ApplyURI(mongodbConnectionPath()))
@@ -116,14 +114,18 @@ func checkLoginUser(vUsername string, vPassword string) {
 	// fmt.Println(test["a"])
 
 	password := episodesFiltered[0]["password"]
-	fmt.Println(password)
+	fmt.Println("Password: ", vPassword)
+	fmt.Println("hash: ", password)
 
-}
+	match := CheckPasswordHash(vPassword, fmt.Sprint(password))
+	fmt.Println("Match:   ", match)
 
-//Login
-func loginUser(username string, password string) string {
-	// 1. check the username is it exists in db
-	// 2. get the info
-	// 3. validate the password
-	return ""
+	if match {
+		result = "Login successfully."
+	} else {
+		result = "Login failed, please try again."
+	}
+
+	return result, vUsername
+
 }
